@@ -68,18 +68,22 @@ function App() {
     const [move, setMove] = useState([]);
 
     const touchstart = (e) => {
+        e.preventDefault();
         console.log('touchstart', e);
         setStart(extractData([...e.touches]));
     };
     const touchend = (e) => {
+        e.preventDefault();
         console.log('touchend', e);
         setEnd(extractData([...e.changedTouches]));
     };
     const touchcancel = (e) => {
+        e.preventDefault();
         console.log('touchcancel', e);
         setCancel(extractData([...e.touches]));
     };
     const touchmove = (e) => {
+        e.preventDefault();
         console.log('touchmove', e);
         setMove(extractData([...e.touches]));
     };
