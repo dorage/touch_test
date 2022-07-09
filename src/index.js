@@ -4,11 +4,20 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { Reset } from 'styled-reset';
+import { createGlobalStyle } from 'styled-components';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
+const GlobalStyle = createGlobalStyle`
+    html.noScroll, html.noScroll > body{
+        overflow:none;
+    }
+`;
+
 root.render(
     <React.StrictMode>
         <Reset />
+        <GlobalStyle />
         <App />
     </React.StrictMode>
 );
