@@ -9,6 +9,9 @@ import { createGlobalStyle } from 'styled-components';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 const GlobalStyle = createGlobalStyle`
+    html, body {
+        overflow: none;
+    }
     html.noScroll, html.noScroll > body{
         overflow:none;
     }
