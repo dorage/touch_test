@@ -7,6 +7,7 @@ const Container = styled.div`
     left: 0;
     right: 0;
     bottom: 0;
+    overflow: none;
     user-select: none;
     -ms-user-select: none;
     -moz-user-select: none;
