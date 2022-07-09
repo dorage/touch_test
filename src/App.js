@@ -1,8 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 
 const Container = styled.div`
     width: 100vw;
+    height: 100vh;
+    user-select: none;
+    -ms-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
 `;
 const Block = styled.div`
     margin-bottom: 2rem;
@@ -82,7 +87,6 @@ function App() {
             onTouchEnd={touchend}
             onTouchCancel={touchcancel}
             onTouchMove={touchmove}
-            className='App'
         >
             <Block>
                 <Text>
