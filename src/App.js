@@ -12,6 +12,7 @@ const Container = styled.div`
     -ms-user-select: none;
     -moz-user-select: none;
     -webkit-user-select: none;
+    touch-action: none;
 `;
 const Block = styled.div`
     margin-bottom: 2rem;
@@ -69,7 +70,6 @@ function App() {
     const [move, setMove] = useState([]);
 
     const touchstart = (e) => {
-        e.preventDefault();
         console.log('touchstart', e);
         setStart(extractData([...e.touches]));
     };
@@ -84,7 +84,6 @@ function App() {
         setCancel(extractData([...e.touches]));
     };
     const touchmove = (e) => {
-        e.preventDefault();
         console.log('touchmove', e);
         setMove(extractData([...e.touches]));
     };
@@ -115,7 +114,7 @@ const PrintBlock = ({ title, list }) => (
     <Block>
         <Head>{title}</Head>
         {list.map((e) => (
-            <Text>{e}</Text>
+            <Text key={e}>{e}</Text>
         ))}
     </Block>
 );
