@@ -60,16 +60,40 @@ const extractData = (touches) =>
             },
             idx
         ) =>
-            `[${idx}] : ${identifier} | ${clientX} ${clientY} | ${screenX} ${screenY} | ${pageX} ${pageY} | ${radiusX} ${radiusY} | ${force} | ${rotationAngle} | `
+            `[${idx}] : ${identifier} | ${clientX} ${clientY} | ${screenX} ${screenY} | ${pageX} ${pageY} | ${radiusX} ${radiusY} | ${force} | ${rotationAngle}`
     );
 
 const GESTURE = {
     IDLE: 'Idle',
     TAP: 'Tap',
     SWIPE: 'Swipe',
+    DOUBLE_TAP: 'DoubleTap',
+    MOVE: 'Move',
     PINCH: 'Pinch',
     ZOOM: 'Zoom',
     ROTATE: 'Rotate',
+};
+
+const getDistance = (x1, y1, x2, y2) =>
+    Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+
+/**
+ * 두 좌표 중간을 pivot으로 잡고 각도를 구한다.
+ * @param {*} x1
+ * @param {*} y1
+ * @param {*} x2
+ * @param {*} y2
+ * @returns
+ */
+const getRotations = (x1, y1, x2, y2) => {
+    const [px, py] = [(x2 + x1) / 2, (y2 + y1) / 2];
+
+    const radians1 = Math.atan2(y1 - py, x1 - px);
+    const degree1 = radians1 * (180 / Math.PI) + 180;
+    const radians2 = Math.atan2(y2 - py, x2 - px);
+    const degree2 = radians2 * (180 / Math.PI) + 180;
+
+    return [degree1 / 360, degree2 / 360];
 };
 
 function App() {
@@ -85,19 +109,42 @@ function App() {
     const [oldTouches, setOldTouches] = useState([]);
     const [touches, setTouches] = useState([]);
 
-    useEffect(() => {
-        if (!touches.length) {
-            setGesture(GESTURE.IDLE);
-            setOldTouches([]);
+    const noTouch = () => {
+        setGesture(GESTURE.IDLE);
+    };
+    const singleTouch = () => {
+        if (!oldTouches.length) setGesture(GESTURE.TAP);
+        else setGesture(GESTURE.SWIPE);
+    };
+    const doubleTouch = () => {
+        if (oldTouches.length < 2) {
+            setGesture(GESTURE.DOUBLE_TAP);
             return;
         }
+        // distance (pinch, zoom)
+        const oldDist = getDistance(oldTouches[0], oldTouches[1]);
+        const currDist = getDistance(touches[0], touches[1]);
+
+        if (oldDist > currDist) {
+            setGesture(GESTURE.PINCH);
+        } else if (oldDist < currDist) {
+            setGesture(GESTURE.ZOOM);
+        }
+    };
+    useEffect(() => {
+        if (touches.length === 0) {
+            noTouch();
+        }
         if (touches.length === 1) {
-            if (!oldTouches.length) setGesture(GESTURE.TAP);
-            else setGesture(GESTURE.SWIPE);
+            singleTouch();
         }
-        if (touches.length > 1) {
+        if (touches.length >= 2) {
+            doubleTouch();
         }
+        setOldTouches(touches);
     }, [touches]);
+
+    //#region event
 
     const touchstart = (e) => {
         console.log('touchstart', e);
@@ -124,7 +171,7 @@ function App() {
         console.log('touchend', e);
         setTouchesRecord({
             ...touchesRecord,
-            end: extractData([...e.changedTouches]),
+            end: extractData([...e.touches]),
         });
 
         setOldTouches(touches);
@@ -139,7 +186,7 @@ function App() {
         console.log('touchcancel', e);
         setTouchesRecord({
             ...touchesRecord,
-            cancel: extractData([...e.changedTouches]),
+            cancel: extractData([...e.touches]),
         });
 
         setOldTouches(touches);
@@ -150,6 +197,8 @@ function App() {
         );
     };
 
+    //#endregion
+
     return (
         <Container
             onTouchStart={touchstart}
@@ -159,12 +208,10 @@ function App() {
         >
             <Block>
                 <Head>Gesture: {gesture}</Head>
-                <Text>
-                    {
-                        'idx | identifier | clientX | clientY | screenX | screenY | pageX | pageY | radiusX | radiusY | force | rotationAngle'
-                    }
-                </Text>
             </Block>
+            <Text>
+                {`identifier | clientX clientY | screenX screenY | pageX pageY | radiusX radiusY | force | rotationAngle`}
+            </Text>
             <PrintBlock title='Touch Start' list={touchesRecord.start} />
             <PrintBlock title='Touch Move' list={touchesRecord.move} />
             <PrintBlock title='Touch End' list={touchesRecord.end} />
